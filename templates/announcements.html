@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Announcements - CampusHire Portal{% endblock %}
+{% block page_title %}Announcements{% endblock %}
+{% block content %}
+
+{% if session.role == 'officer' %}
+<div class="card" style="margin-bottom:24px;max-width:700px;">
+    <div class="card-header"><span class="card-title">Post New Announcement</span></div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input type="text" name="title" class="form-control" required placeholder="Announcement title">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Content *</label>
+                <textarea name="content" class="form-control" required placeholder="Write the announcement details here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-bullhorn"></i> Post Announcement</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header"><span class="card-title">All Announcements ({{ announcements|length }})</span></div>
+    {% if announcements %}
+    <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+        {% for ann in announcements %}
+        <div style="padding:18px;background:var(--gray-50);border-radius:10px;border-left:4px solid var(--primary);">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;">
+                <div style="font-size:1rem;font-weight:700;color:var(--gray-800);">{{ ann.title }}</div>
+                {% if session.role == 'officer' %}
+                <form method="POST" action="{{ url_for('delete_announcement', aid=ann.id) }}" onsubmit="return confirm('Delete this announcement?')">
+                    <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                </form>
+                {% endif %}
+            </div>
+            <div style="color:var(--gray-600);line-height:1.7;margin-bottom:10px;">{{ ann.content }}</div>
+            <div style="font-size:0.78rem;color:var(--gray-400);">
+                <i class="fas fa-user"></i> {{ ann.author }} &nbsp;&nbsp;
+                <i class="fas fa-clock"></i> {{ ann.created_at[:16] }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-bullhorn"></i><p>No announcements yet.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

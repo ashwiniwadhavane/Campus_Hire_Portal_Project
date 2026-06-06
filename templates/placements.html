@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Placements - CampusHire Portal{% endblock %}
+{% block page_title %}Placements{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header"><span class="card-title">Placement Records ({{ placements|length }})</span></div>
+    {% if placements %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    {% if session.role != 'student' %}<th>Student</th>{% endif %}
+                    {% if session.role != 'company' %}<th>Company</th>{% endif %}
+                    <th>Role</th>
+                    <th>Package (LPA)</th>
+                    <th>Offer Date</th>
+                    <th>Joining Date</th>
+                    {% if session.role == 'officer' %}<th>Action</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in placements %}
+            <tr>
+                {% if session.role != 'student' %}
+                <td>
+                    <div style="font-weight:600;">{{ p.student_name }}</div>
+                    <div class="text-muted text-sm">{{ p.roll_number }} | {{ p.department }}</div>
+                </td>
+                {% endif %}
+                {% if session.role != 'company' %}
+                <td><div style="font-weight:600;">{{ p.company_name }}</div></td>
+                {% endif %}
+                <td>{{ p.title }}</td>
+                <td>
+                    {% if p.package %}
+                    <span style="font-weight:800;font-size:1.1rem;color:var(--success);">₹{{ p.package }}</span>
+                    {% else %}
+                    <span class="text-muted">Not updated</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted">{{ p.offer_date or '—' }}</td>
+                <td class="text-muted">{{ p.joining_date or '—' }}</td>
+                {% if session.role == 'officer' %}
+                <td>
+                    <button class="btn btn-outline btn-sm" onclick="openPlacementModal({{ p.id }}, '{{ p.package or '' }}', '{{ p.offer_date or '' }}', '{{ p.joining_date or '' }}')">
+                        <i class="fas fa-edit"></i> Update
+                    </button>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-trophy"></i><p>No placement records yet.</p></div>
+    {% endif %}
+</div>
+
+{% if session.role == 'officer' %}
+<div class="modal" id="placementModal">
+    <div class="modal-box">
+        <div class="modal-title">Update Placement Details</div>
+        <form method="POST" id="placementForm">
+            <div class="form-group">
+                <label class="form-label">Package (LPA)</label>
+                <input type="number" name="package" id="pkg_input" class="form-control" step="0.1" min="0" placeholder="e.g. 12.5">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Offer Date</label>
+                    <input type="date" name="offer_date" id="offer_input" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Joining Date</label>
+                    <input type="date" name="joining_date" id="join_input" class="form-control">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('placementModal').classList.remove('active')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+function openPlacementModal(id, pkg, offer, joining) {
+    document.getElementById('pkg_input').value = pkg;
+    document.getElementById('offer_input').value = offer;
+    document.getElementById('join_input').value = joining;
+    document.getElementById('placementForm').action = '/placements/update/' + id;
+    document.getElementById('placementModal').classList.add('active');
+}
+document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Edit Job - CampusHire Portal{% endblock %}
+{% block page_title %}Edit Job{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <a href="{{ url_for('job_detail', jid=job.id) }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="card" style="max-width:820px;">
+    <div class="card-header"><span class="card-title">Edit Job: {{ job.title }}</span></div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Job Title *</label>
+                    <input type="text" name="title" class="form-control" value="{{ job.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <option value="open" {{ 'selected' if job.status == 'open' }}>Open</option>
+                        <option value="closed" {{ 'selected' if job.status == 'closed' }}>Closed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label class="form-label">Job Description</label><textarea name="description" class="form-control">{{ job.description or '' }}</textarea></div>
+            <div class="form-group"><label class="form-label">Requirements</label><textarea name="requirements" class="form-control" style="min-height:80px;">{{ job.requirements or '' }}</textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label class="form-label">Location</label><input type="text" name="location" class="form-control" value="{{ job.location or '' }}"></div>
+                <div class="form-group">
+                    <label class="form-label">Job Type</label>
+                    <select name="job_type" class="form-control">
+                        {% for t in ['full-time','part-time','internship','contract'] %}
+                        <option {{ 'selected' if job.job_type == t }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row-3">
+                <div class="form-group"><label class="form-label">Min Salary (LPA)</label><input type="number" name="salary_min" class="form-control" step="0.1" value="{{ job.salary_min or '' }}"></div>
+                <div class="form-group"><label class="form-label">Max Salary (LPA)</label><input type="number" name="salary_max" class="form-control" step="0.1" value="{{ job.salary_max or '' }}"></div>
+                <div class="form-group"><label class="form-label">Deadline</label><input type="date" name="deadline" class="form-control" value="{{ job.deadline or '' }}"></div>
+            </div>
+            <div class="form-row-3">
+                <div class="form-group"><label class="form-label">Min CGPA</label><input type="number" name="min_cgpa" class="form-control" step="0.1" value="{{ job.min_cgpa or 0 }}"></div>
+                <div class="form-group"><label class="form-label">Allowed Backlogs</label><input type="number" name="allowed_backlogs" class="form-control" value="{{ job.allowed_backlogs or 0 }}"></div>
+                <div class="form-group"><label class="form-label">Allowed Departments</label><input type="text" name="allowed_departments" class="form-control" value="{{ job.allowed_departments or '' }}"></div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                <a href="{{ url_for('job_detail', jid=job.id) }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

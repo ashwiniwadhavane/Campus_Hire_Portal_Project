@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Edit Company - CampusHire Portal{% endblock %}
+{% block page_title %}Edit Company{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <a href="{{ url_for('company_detail', cid=company.id) }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="card" style="max-width:700px;">
+    <div class="card-header"><span class="card-title">Edit: {{ company.name }}</span></div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    <input type="text" name="name" class="form-control" value="{{ company.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Industry</label>
+                    <select name="industry" class="form-control">
+                        <option value="">Select</option>
+                        {% for ind in ['IT & Software','Banking & Finance','Manufacturing','Consulting','Healthcare','Education','E-commerce','Telecom','Government','Other'] %}
+                        <option {{ 'selected' if company.industry == ind }}>{{ ind }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label class="form-label">Website</label><input type="url" name="website" class="form-control" value="{{ company.website or '' }}"></div>
+            <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control">{{ company.description or '' }}</textarea></div>
+            <div class="form-row-3">
+                <div class="form-group"><label class="form-label">HR Name</label><input type="text" name="hr_name" class="form-control" value="{{ company.hr_name or '' }}"></div>
+                <div class="form-group"><label class="form-label">HR Email</label><input type="email" name="hr_email" class="form-control" value="{{ company.hr_email or '' }}"></div>
+                <div class="form-group"><label class="form-label">HR Phone</label><input type="text" name="hr_phone" class="form-control" value="{{ company.hr_phone or '' }}"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Address</label><textarea name="address" class="form-control" style="min-height:70px;">{{ company.address or '' }}</textarea></div>
+            <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="{{ url_for('company_detail', cid=company.id) }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

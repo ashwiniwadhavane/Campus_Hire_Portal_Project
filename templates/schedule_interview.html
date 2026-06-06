@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Schedule Interview - CampusHire Portal{% endblock %}
+{% block page_title %}Schedule Interview{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <a href="{{ url_for('interviews') }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="card" style="max-width:700px;">
+    <div class="card-header"><span class="card-title">Schedule an Interview</span></div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Select Application *</label>
+                <select name="application_id" class="form-control" required>
+                    <option value="">Select shortlisted application...</option>
+                    {% for app in applications %}
+                    <option value="{{ app.id }}">{{ app.student_name }} ({{ app.roll_number }}) — {{ app.title }} @ {{ app.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Interview Date *</label>
+                    <input type="date" name="interview_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Interview Time *</label>
+                    <input type="time" name="interview_time" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Interview Type</label>
+                    <select name="interview_type" class="form-control">
+                        <option value="in-person">In-Person</option>
+                        <option value="online">Online</option>
+                        <option value="telephonic">Telephonic</option>
+                        <option value="panel">Panel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Round Number</label>
+                    <select name="round_number" class="form-control">
+                        {% for r in range(1, 6) %}
+                        <option value="{{ r }}">Round {{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Venue</label>
+                <input type="text" name="venue" class="form-control" placeholder="e.g. Conference Room 3, Main Campus Block A">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Online Interview Link</label>
+                <input type="url" name="interview_link" class="form-control" placeholder="https://meet.google.com/...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea name="notes" class="form-control" placeholder="Any special instructions for the candidate..."></textarea>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-success"><i class="fas fa-calendar-check"></i> Schedule Interview</button>
+                <a href="{{ url_for('interviews') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - CampusHire Portal{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+{% if role == 'officer' %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-trophy"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.placed_students }}</div>
+            <div class="stat-label">Students Placed</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-building"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.total_companies }}</div>
+            <div class="stat-label">Companies</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="fas fa-briefcase"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.open_jobs }}</div>
+            <div class="stat-label">Open Jobs</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon cyan"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.total_applications }}</div>
+            <div class="stat-label">Applications</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.scheduled_interviews }}</div>
+            <div class="stat-label">Pending Interviews</div>
+        </div>
+    </div>
+</div>
+
+{% if data.total_students > 0 %}
+<div style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <span style="font-size:0.875rem;font-weight:600;color:var(--gray-600);">Overall Placement Rate</span>
+        <span style="font-weight:800;color:var(--primary);">{{ ((data.placed_students / data.total_students) * 100) | round(1) }}%</span>
+    </div>
+    <div class="progress-bar-wrap">
+        <div class="progress-bar" data-pct="{{ ((data.placed_students / data.total_students) * 100) | round(0) }}"></div>
+    </div>
+</div>
+{% endif %}
+
+<div class="dashboard-grid">
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Recent Applications</span>
+                <a href="{{ url_for('applications') }}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            {% if data.recent_applications %}
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Student</th><th>Job</th><th>Company</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody>
+                    {% for app in data.recent_applications %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ app.student_name }}</div>
+                            <div class="text-muted text-sm">{{ app.roll_number }}</div>
+                        </td>
+                        <td>{{ app.title }}</td>
+                        <td>{{ app.company_name }}</td>
+                        <td><span class="badge badge-{{ app.status }}">{{ app.status.replace('_', ' ') }}</span></td>
+                        <td class="text-muted text-sm">{{ app.applied_at | dateformat }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="fas fa-inbox"></i><p>No applications yet</p></div>
+            {% endif %}
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+            <div class="card-header">
+                <span class="card-title">Recent Placements</span>
+                <a href="{{ url_for('placements') }}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            {% if data.recent_placements %}
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Package</th></tr></thead>
+                    <tbody>
+                    {% for p in data.recent_placements %}
+                    <tr>
+                        <td>{{ p.student_name }}</td>
+                        <td>{{ p.company_name }}</td>
+                        <td>{{ p.title }}</td>
+                        <td>{% if p.package %}₹{{ p.package }}L{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="fas fa-trophy"></i><p>No placements yet</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header"><span class="card-title">Department Stats</span></div>
+            <div class="card-body">
+                {% if data.dept_stats %}
+                <div class="dept-stats">
+                    {% for d in data.dept_stats %}
+                    {% set pct = ((d.placed / d.total) * 100) | round(0) if d.total > 0 else 0 %}
+                    <div class="dept-item">
+                        <div class="dept-name" title="{{ d.department }}">{{ d.department[:12] }}{% if d.department|length > 12 %}…{% endif %}</div>
+                        <div class="dept-bar-wrap">
+                            <div class="dept-bar" data-pct="{{ pct }}"></div>
+                        </div>
+                        <div class="dept-pct">{{ pct }}%</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state"><i class="fas fa-chart-bar"></i><p>No data</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Announcements</span>
+                <a href="{{ url_for('announcements') }}" class="btn btn-outline btn-sm">Manage</a>
+            </div>
+            <div class="card-body">
+                {% if data.announcements %}
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    {% for ann in data.announcements %}
+                    <div style="padding:12px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--primary);">
+                        <div style="font-weight:600;font-size:0.875rem;margin-bottom:4px;">{{ ann.title }}</div>
+                        <div class="text-muted text-sm">{{ ann.content[:80] }}{% if ann.content|length > 80 %}…{% endif %}</div>
+                        <div class="text-muted text-sm mt-1">{{ ann.created_at | dateformat }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state"><i class="fas fa-bullhorn"></i><p>No announcements</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif role == 'student' %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-briefcase"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.open_jobs_count }}</div>
+            <div class="stat-label">Open Jobs</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon cyan"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.applied_count }}</div>
+            <div class="stat-label">Applied</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ data.shortlisted_count }}</div>
+            <div class="stat-label">Shortlisted</div>
+        </div>
+    </div>
+    {% if data.student %}
+    <div class="stat-card">
+        <div class="stat-icon {{ 'green' if data.student.is_placed else 'orange' }}">
+            <i class="fas fa-{{ 'trophy' if data.student.is_placed else 'hourglass-half' }}"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ 'Placed' if data.student.is_placed else 'Active' }}</div>
+            <div class="stat-label">Status</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if data.student %}
+<div class="dashboard-grid">
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">My Applications</span>
+                <a href="{{ url_for('applications') }}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            {% if data.my_applications %}
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Job</th><th>Company</th><th>Package</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for app in data.my_applications %}
+                    <tr>
+                        <td><div style="font-weight:600;">{{ app.title }}</div></td>
+                        <td>{{ app.company_name }}</td>
+                        <td>{% if app.salary_max %}₹{{ app.salary_max }}L{% else %}—{% endif %}</td>
+                        <td><span class="badge badge-{{ app.status }}">{{ app.status.replace('_',' ') }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="fas fa-file-alt"></i><p>No applications yet. <a href="{{ url_for('jobs') }}">Browse jobs</a></p></div>
+            {% endif %}
+        </div>
+
+        {% if data.interviews %}
+        <div class="card" style="margin-top:20px;">
+            <div class="card-header"><span class="card-title">Upcoming Interviews</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                {% for iv in data.interviews %}
+                <div style="padding:12px;background:var(--warning-light);border-radius:8px;border-left:3px solid var(--warning);">
+                    <div style="font-weight:700;">{{ iv.title }} @ {{ iv.company_name }}</div>
+                    <div class="text-sm" style="margin-top:4px;">
+                        <i class="fas fa-calendar"></i> {{ iv.interview_date }}
+                        &nbsp;&nbsp;<i class="fas fa-clock"></i> {{ iv.interview_time }}
+                        &nbsp;&nbsp;<i class="fas fa-tag"></i> {{ iv.interview_type }}
+                    </div>
+                    {% if iv.venue %}<div class="text-sm text-muted"><i class="fas fa-map-marker-alt"></i> {{ iv.venue }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+                <span class="card-title">My Profile</span>
+                <a href="{{ url_for('edit_student', sid=data.student.id) }}" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i> Edit</a>
+            </div>
+            <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div class="detail-item"><div class="detail-label">Name</div><div class="detail-value">{{ data.student.name }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Roll Number</div><div class="detail-value">{{ data.student.roll_number }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Department</div><div class="detail-value">{{ data.student.department }}</div></div>
+                    <div class="detail-item"><div class="detail-label">CGPA</div><div class="detail-value">{{ data.student.cgpa or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Backlogs</div><div class="detail-value">{{ data.student.backlogs or 0 }}</div></div>
+                    <div class="detail-item">
+                        <div class="detail-label">Placement Status</div>
+                        <div class="detail-value">
+                            <span class="badge badge-{{ 'placed' if data.student.is_placed else 'not-placed' }}">
+                                {{ 'Placed' if data.student.is_placed else 'Not Placed' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="card-title">Announcements</span></div>
+            <div class="card-body">
+                {% if data.announcements %}
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    {% for ann in data.announcements %}
+                    <div style="padding:10px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--primary);">
+                        <div style="font-weight:600;font-size:0.875rem;">{{ ann.title }}</div>
+                        <div class="text-muted text-sm mt-1">{{ ann.content[:80] }}{% if ann.content|length > 80 %}…{% endif %}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state"><i class="fas fa-bullhorn"></i><p>No announcements</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% elif role == 'company' %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-briefcase"></i></div>
+        <div class="stat-info"><div class="stat-value">{{ data.open_jobs }}</div><div class="stat-label">Open Jobs</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon cyan"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-info"><div class="stat-value">{{ data.total_applications }}</div><div class="stat-label">Total Applications</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div class="stat-info"><div class="stat-value">{{ data.shortlisted }}</div><div class="stat-label">Shortlisted</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-trophy"></i></div>
+        <div class="stat-info"><div class="stat-value">{{ data.selected }}</div><div class="stat-label">Selected</div></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Recent Applications</span>
+        <a href="{{ url_for('applications') }}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    {% if data.recent_apps %}
+    <div class="table-container">
+        <table>
+            <thead><tr><th>Student</th><th>Roll</th><th>Department</th><th>CGPA</th><th>Job</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for app in data.recent_apps %}
+            <tr>
+                <td><div style="font-weight:600;">{{ app.student_name }}</div></td>
+                <td>{{ app.roll_number }}</td>
+                <td>{{ app.department }}</td>
+                <td>{{ app.cgpa }}</td>
+                <td>{{ app.title }}</td>
+                <td><span class="badge badge-{{ app.status }}">{{ app.status.replace('_',' ') }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-inbox"></i><p>No applications yet</p></div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

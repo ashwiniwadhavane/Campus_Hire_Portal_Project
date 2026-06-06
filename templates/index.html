@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}CampusHire Portal - Campus Recruitment Management{% endblock %}
+{% block auth_content %}
+<div class="landing">
+    <nav class="landing-nav">
+        <div class="landing-logo">
+            <i class="fas fa-graduation-cap"></i>
+            CampusHire Portal
+        </div>
+        <div class="landing-nav-links">
+            <a href="{{ url_for('login') }}" class="btn btn-outline">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-hero-primary">Register</a>
+        </div>
+    </nav>
+
+    <div class="landing-hero">
+        <h1>Campus Recruitment<br><span>Reimagined</span></h1>
+        <p>A centralized digital platform connecting students, placement officers, and companies for a seamless campus hiring experience.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn-hero-primary">New User</a>
+            <a href="{{ url_for('login') }}" class="btn-hero-outline">Sign In</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎓</div>
+            <h3>Student Management</h3>
+            <p>Maintain complete student profiles with CGPA, department, skills, and placement history — all in one place.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🏢</div>
+            <h3>Company Portal</h3>
+            <p>Companies post jobs, review applications, and manage the entire hiring funnel from shortlisting to selection.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>Eligibility Check</h3>
+            <p>Automated eligibility verification based on CGPA, backlogs, and department criteria before applications are accepted.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Interview Scheduling</h3>
+            <p>Schedule and track multi-round interviews with venue details, online links, and result updates for each candidate.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Analytics & Reports</h3>
+            <p>Placement officer dashboards with department-wise stats, package insights, and company-wise hiring reports.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📢</div>
+            <h3>Announcements</h3>
+            <p>Placement officers broadcast recruitment drives, deadlines, and important notices instantly to all students.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

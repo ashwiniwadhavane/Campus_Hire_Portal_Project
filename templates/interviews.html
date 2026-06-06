@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Interviews - CampusHire Portal{% endblock %}
+{% block page_title %}Interviews{% endblock %}
+{% block content %}
+
+<div class="page-actions">
+    <span></span>
+    {% if session.role in ('officer','company') %}
+    <a href="{{ url_for('schedule_interview') }}" class="btn btn-success"><i class="fas fa-calendar-plus"></i> Schedule Interview</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header"><span class="card-title">All Interviews ({{ interviews|length }})</span></div>
+    {% if interviews %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    {% if session.role != 'student' %}<th>Student</th>{% endif %}
+                    <th>Job</th>
+                    <th>Company</th>
+                    <th>Date & Time</th>
+                    <th>Type</th>
+                    <th>Round</th>
+                    <th>Venue / Link</th>
+                    <th>Result</th>
+                    {% if session.role != 'student' %}<th>Action</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for iv in interviews %}
+            <tr>
+                {% if session.role != 'student' %}
+                <td>
+                    <div style="font-weight:600;">{{ iv.student_name }}</div>
+                    <div class="text-muted text-sm">{{ iv.roll_number }} | {{ iv.department }}</div>
+                </td>
+                {% endif %}
+                <td>{{ iv.title }}</td>
+                <td>{{ iv.company_name }}</td>
+                <td>
+                    <div style="font-weight:600;">{{ iv.interview_date }}</div>
+                    <div class="text-muted text-sm">{{ iv.interview_time }}</div>
+                </td>
+                <td><span class="badge badge-applied">{{ iv.interview_type }}</span></td>
+                <td>Round {{ iv.round_number }}</td>
+                <td>
+                    {% if iv.venue %}<div class="text-sm"><i class="fas fa-map-marker-alt"></i> {{ iv.venue }}</div>{% endif %}
+                    {% if iv.interview_link %}<a href="{{ iv.interview_link }}" target="_blank" class="text-sm" style="color:var(--primary);"><i class="fas fa-video"></i> Join</a>{% endif %}
+                    {% if not iv.venue and not iv.interview_link %}<span class="text-muted">—</span>{% endif %}
+                </td>
+                <td>
+                    <span class="badge badge-{{ iv.result }}">{{ iv.result }}</span>
+                </td>
+                {% if session.role != 'student' %}
+                <td>
+                    <form method="POST" action="{{ url_for('update_interview_result', iid=iv.id) }}" style="display:flex;gap:4px;">
+                        <select name="result" class="form-control" style="padding:4px 6px;font-size:0.75rem;width:100px;">
+                            <option value="pending" {{ 'selected' if iv.result == 'pending' }}>Pending</option>
+                            <option value="pass" {{ 'selected' if iv.result == 'pass' }}>Pass</option>
+                            <option value="fail" {{ 'selected' if iv.result == 'fail' }}>Fail</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-check"></i></button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-calendar-check"></i><p>No interviews scheduled yet.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

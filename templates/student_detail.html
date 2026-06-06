@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.name }} - CampusHire Portal{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <a href="{{ url_for('students') if session.role == 'officer' else url_for('dashboard') }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+    <a href="{{ url_for('edit_student', sid=student.id) }}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+                <span class="card-title">Personal Information</span>
+                <span class="badge badge-{{ 'placed' if student.is_placed else 'not-placed' }} " style="font-size:0.8rem;">
+                    {{ 'Placed' if student.is_placed else 'Not Placed' }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Full Name</div><div class="detail-value">{{ student.name }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Roll Number</div><div class="detail-value" style="font-family:monospace;">{{ student.roll_number }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value">{{ student.email }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">{{ student.phone or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Department</div><div class="detail-value">{{ student.department }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Year of Passing</div><div class="detail-value">{{ student.year_of_passing or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">CGPA</div><div class="detail-value" style="font-size:1.2rem;font-weight:800;color:var(--primary);">{{ student.cgpa or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Backlogs</div><div class="detail-value">{{ student.backlogs or 0 }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Gender</div><div class="detail-value">{{ student.gender or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Date of Birth</div><div class="detail-value">{{ student.date_of_birth or '—' }}</div></div>
+                </div>
+                {% if student.address %}
+                <div class="detail-item" style="margin-top:12px;"><div class="detail-label">Address</div><div class="detail-value">{{ student.address }}</div></div>
+                {% endif %}
+                {% if student.skills %}
+                <div style="margin-top:16px;">
+                    <div class="detail-label">Skills</div>
+                    <div style="margin-top:6px;">
+                        {% for skill in student.skills.split(',') %}
+                        <span class="tag">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Applications ({{ applications|length }})</span>
+            </div>
+            {% if applications %}
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Job</th><th>Company</th><th>Applied</th><th>Interview</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td><div style="font-weight:600;">{{ app.title }}</div><div class="text-muted text-sm">{{ app.location }}</div></td>
+                        <td>{{ app.company_name }}</td>
+                        <td class="text-muted text-sm">{{ app.applied_at | dateformat }}</td>
+                        <td>
+                            {% if app.interview_date %}
+                            <div>{{ app.interview_date }}</div>
+                            <div class="text-muted text-sm">{{ app.interview_type }}</div>
+                            {% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td><span class="badge badge-{{ app.status }}">{{ app.status.replace('_',' ') }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="fas fa-file-alt"></i><p>No applications yet</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        {% if placement %}
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header" style="background:var(--success-light);">
+                <span class="card-title" style="color:var(--success);"><i class="fas fa-trophy"></i> Placement Details</span>
+            </div>
+            <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div class="detail-item"><div class="detail-label">Company</div><div class="detail-value">{{ placement.company_name }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Role</div><div class="detail-value">{{ placement.title }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Package</div><div class="detail-value" style="color:var(--success);font-size:1.2rem;font-weight:800;">{% if placement.package %}₹{{ placement.package }} LPA{% else %}Not updated{% endif %}</div></div>
+                    <div class="detail-item"><div class="detail-label">Offer Date</div><div class="detail-value">{{ placement.offer_date or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Joining Date</div><div class="detail-value">{{ placement.joining_date or '—' }}</div></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header"><span class="card-title">Quick Stats</span></div>
+            <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--gray-600);">Applied</span>
+                            <span style="font-weight:700;">{{ applications|length }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--gray-600);">Shortlisted</span>
+                            <span style="font-weight:700;color:var(--secondary);">{{ applications|selectattr('status','equalto','shortlisted')|list|length }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--gray-600);">Interviews</span>
+                            <span style="font-weight:700;color:var(--warning);">{{ applications|selectattr('status','equalto','interview_scheduled')|list|length }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--gray-600);">Selected</span>
+                            <span style="font-weight:700;color:var(--success);">{{ applications|selectattr('status','equalto','selected')|list|length }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

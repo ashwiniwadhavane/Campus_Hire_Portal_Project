@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Jobs - CampusHire Portal{% endblock %}
+{% block page_title %}Job Listings{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <form method="GET" class="search-bar" style="flex:1;">
+        <div class="search-input-wrap" style="flex:1;max-width:320px;">
+            <i class="fas fa-search"></i>
+            <input type="text" name="search" class="search-input" placeholder="Search jobs..." value="{{ search }}">
+        </div>
+        <select name="status" class="form-control" style="width:150px;">
+            <option value="">All Status</option>
+            <option value="open" {{ 'selected' if status == 'open' }}>Open</option>
+            <option value="closed" {{ 'selected' if status == 'closed' }}>Closed</option>
+        </select>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+        <a href="{{ url_for('jobs') }}" class="btn btn-outline">Clear</a>
+    </form>
+    {% if session.role in ('officer','company') %}
+    <a href="{{ url_for('add_job') }}" class="btn btn-success"><i class="fas fa-plus"></i> Post Job</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header"><span class="card-title">Jobs ({{ jobs|length }})</span></div>
+    {% if jobs %}
+    <div class="table-container">
+        <table>
+            <thead><tr><th>#</th><th>Job Title</th><th>Company</th><th>Type</th><th>Package</th><th>Min CGPA</th><th>Deadline</th><th>Apps</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for j in jobs %}
+            <tr>
+                <td class="text-muted">{{ loop.index }}</td>
+                <td>
+                    <div style="font-weight:700;">{{ j.title }}</div>
+                    {% if j.location %}<div class="text-muted text-sm"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</div>{% endif %}
+                </td>
+                <td>{{ j.company_name }}</td>
+                <td>{{ j.job_type }}</td>
+                <td>{% if j.salary_min and j.salary_max %}₹{{ j.salary_min }}–{{ j.salary_max }}L{% elif j.salary_max %}₹{{ j.salary_max }}L{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                <td>{{ j.min_cgpa or '—' }}</td>
+                <td class="text-muted text-sm">{{ j.deadline or '—' }}</td>
+                <td><span style="font-weight:700;color:var(--primary);">{{ j.app_count }}</span></td>
+                <td><span class="badge badge-{{ j.status }}">{{ j.status }}</span></td>
+                <td>
+                    <a href="{{ url_for('job_detail', jid=j.id) }}" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i></a>
+                    {% if session.role in ('officer','company') %}
+                    <a href="{{ url_for('edit_job', jid=j.id) }}" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-briefcase"></i><p>No jobs found.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

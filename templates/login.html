@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Login - CampusHire Portal{% endblock %}
+{% block auth_content %}
+<div class="auth-card">
+    <div class="auth-header">
+        <div class="auth-logo"><i class="fas fa-graduation-cap"></i></div>
+        <div class="auth-title">CampusHire Portal</div>
+        <div class="auth-subtitle">Sign in to your account</div>
+    </div>
+    <div class="auth-body">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" placeholder="you@campus.edu" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </form>
+        
+    </div>
+    <div class="auth-footer">
+        Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+    </div>
+</div>
+{% endblock %}

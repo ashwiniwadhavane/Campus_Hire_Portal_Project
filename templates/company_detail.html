@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}{{ company.name }} - CampusHire Portal{% endblock %}
+{% block page_title %}Company Profile{% endblock %}
+{% block content %}
+<div class="page-actions">
+    <a href="{{ url_for('companies') }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+    {% if session.role == 'officer' or session.get('company_id') == company.id %}
+    <div style="display:flex;gap:8px;">
+        <a href="{{ url_for('edit_company', cid=company.id) }}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+        {% if session.role in ('officer','company') %}
+        <a href="{{ url_for('add_job') }}" class="btn btn-success"><i class="fas fa-plus"></i> Post Job</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header"><span class="card-title">Company Information</span></div>
+            <div class="card-body">
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                    <div style="width:64px;height:64px;border-radius:12px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:var(--primary);">{{ company.name[0] }}</div>
+                    <div>
+                        <div style="font-size:1.25rem;font-weight:800;">{{ company.name }}</div>
+                        {% if company.industry %}<div class="text-muted">{{ company.industry }}</div>{% endif %}
+                        {% if company.website %}<a href="{{ company.website }}" target="_blank" style="color:var(--primary);font-size:0.875rem;">{{ company.website }}</a>{% endif %}
+                    </div>
+                </div>
+                {% if company.description %}
+                <p style="color:var(--gray-600);margin-bottom:16px;">{{ company.description }}</p>
+                {% endif %}
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">HR Name</div><div class="detail-value">{{ company.hr_name or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">HR Email</div><div class="detail-value">{{ company.hr_email or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">HR Phone</div><div class="detail-value">{{ company.hr_phone or '—' }}</div></div>
+                    <div class="detail-item"><div class="detail-label">Address</div><div class="detail-value">{{ company.address or '—' }}</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Job Postings ({{ jobs|length }})</span>
+                {% if session.role in ('officer','company') %}
+                <a href="{{ url_for('add_job') }}" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> Post Job</a>
+                {% endif %}
+            </div>
+            {% if jobs %}
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Title</th><th>Type</th><th>Salary</th><th>Deadline</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    {% for j in jobs %}
+                    <tr>
+                        <td><div style="font-weight:600;">{{ j.title }}</div><div class="text-muted text-sm">{{ j.location }}</div></td>
+                        <td>{{ j.job_type }}</td>
+                        <td>{% if j.salary_max %}₹{{ j.salary_min }}–{{ j.salary_max }}L{% else %}—{% endif %}</td>
+                        <td class="text-muted text-sm">{{ j.deadline or '—' }}</td>
+                        <td><span class="badge badge-{{ j.status }}">{{ j.status }}</span></td>
+                        <td><a href="{{ url_for('job_detail', jid=j.id) }}" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="fas fa-briefcase"></i><p>No jobs posted yet</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <div class="card-header"><span class="card-title">Quick Stats</span></div>
+            <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <div class="stat-card" style="box-shadow:none;padding:12px;background:var(--gray-50);">
+                        <div class="stat-icon blue" style="width:40px;height:40px;font-size:1rem;"><i class="fas fa-briefcase"></i></div>
+                        <div class="stat-info"><div class="stat-value" style="font-size:1.4rem;">{{ jobs|length }}</div><div class="stat-label">Total Jobs Posted</div></div>
+                    </div>
+                    <div class="stat-card" style="box-shadow:none;padding:12px;background:var(--gray-50);">
+                        <div class="stat-icon green" style="width:40px;height:40px;font-size:1rem;"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info"><div class="stat-value" style="font-size:1.4rem;">{{ jobs|selectattr('status','equalto','open')|list|length }}</div><div class="stat-label">Open Jobs</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
